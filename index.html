@@ -1393,25 +1393,29 @@
           : Array.from(new Set([preferred, 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest']));
         let lastErr = 'Gemini API error';
         for (const model of models) {
-          const res = await fetchWithTimeout(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey.trim())}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }],
-                ...(jsonMode ? { generationConfig: { responseMimeType: 'application/json' } } : {})
-              })
-            },
-            8000
-          );
-          const data = await res.json().catch(() => ({}));
-          if (res.ok) {
-            state.aiConfig.model = model;
-            return data.candidates?.[0]?.content?.parts?.[0]?.text || 'OK';
+          try {
+            const res = await fetchWithTimeout(
+              `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey.trim())}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: promptText }] }],
+                  ...(jsonMode ? { generationConfig: { responseMimeType: 'application/json' } } : {})
+                })
+              },
+              15000
+            );
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+              state.aiConfig.model = model;
+              return data.candidates?.[0]?.content?.parts?.[0]?.text || 'OK';
+            }
+            lastErr = data.error?.message || `HTTP ${res.status}`;
+            if (![404, 429, 500, 503].includes(res.status)) break;
+          } catch (attemptErr) {
+            lastErr = attemptErr?.message || 'Request failed';
           }
-          lastErr = data.error?.message || `HTTP ${res.status}`;
-          if (![404, 429, 500, 503].includes(res.status)) break;
         }
         throw new Error(lastErr);
       }
@@ -1889,27 +1893,43 @@ Return ONLY valid JSON with this exact shape:
         state.aiConfig.apiKey = key;
         state.aiConfig.model = (selModel === 'custom' || customModel) ? (customModel || (provider === 'openai' ? 'gpt-4o-mini' : 'gemini-3.8-flash')) : selModel;
 
+        let keyVerifiedViaList = false;
         if (provider === 'gemini') {
           const listRes = await fetchWithTimeout(
             `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`,
             {},
-            8000
+            10000
           );
           const listData = await listRes.json().catch(() => ({}));
           if (!listRes.ok) {
             throw new Error(listData.error?.message || `HTTP ${listRes.status}`);
           }
+          keyVerifiedViaList = true;
           const usable = (listData.models || [])
             .filter((m) => (m.supportedGenerationMethods || []).includes('generateContent'))
             .map((m) => m.name.replace(/^models\//, ''));
-          const preferredOrder = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-4-argon'];
-          const bestModel = preferredOrder.find((m) => usable.includes(m)) || usable.find((m) => !m.includes('2.5-flash') && !m.includes('2.0-flash') && !m.includes('1.5')) || 'gemini-3.8-flash';
+          const preferredOrder = ['gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-4-argon'];
+          const bestModel = preferredOrder.find((m) => usable.includes(m)) || usable.find((m) => !m.includes('2.5-flash') && !m.includes('2.0-flash') && !m.includes('1.5')) || 'gemini-3.6-flash';
           if (!state.aiConfig.model || state.aiConfig.model === 'gemini-2.5-flash' || !usable.includes(state.aiConfig.model)) {
             state.aiConfig.model = bestModel;
           }
+          saveState();
         }
 
-        const reply = await callUserLLM('Reply with OK', true);
+        let reply = null;
+        try {
+          reply = await callUserLLM('Reply with OK', true);
+        } catch (genErr) {
+          if (keyVerifiedViaList) {
+            renderHeaderAndNav();
+            renderProfile();
+            statusEl.classList.remove('bg-slate-100', 'text-slate-700');
+            statusEl.classList.add('bg-emerald-50', 'text-emerald-700');
+            statusEl.textContent = `Key verified & saved! (Model ${state.aiConfig.model} was slow to respond: ${genErr.message})`;
+            return;
+          }
+          throw genErr;
+        }
         if (reply) {
           saveState();
           renderHeaderAndNav();
