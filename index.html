@@ -1387,7 +1387,7 @@
       }
     }
 
-    async function callUserLLM(promptText, singleModelOnly = false, jsonMode = false) {
+    async function callUserLLM(promptText, singleModelOnly = false, jsonMode = false, jsonSchema = null) {
       const { provider, apiKey } = state.aiConfig;
       if (!apiKey || provider === 'offline') return null;
 
@@ -1407,7 +1407,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   contents: [{ parts: [{ text: promptText }] }],
-                  ...(jsonMode ? { generationConfig: { responseMimeType: 'application/json' } } : {})
+                  ...(jsonMode ? { generationConfig: { responseMimeType: 'application/json', ...(jsonSchema ? { responseSchema: jsonSchema } : {}) } } : {})
                 })
               },
               15000
@@ -1512,8 +1512,40 @@ Return ONLY valid JSON with this exact shape:
   }
 }`;
 
+      const sessionSchema = {
+        type: 'OBJECT',
+        properties: {
+          questions: {
+            type: 'ARRAY',
+            items: {
+              type: 'OBJECT',
+              properties: {
+                pillar: { type: 'STRING' },
+                prompt: { type: 'STRING' },
+                framework: { type: 'STRING' },
+                sourceRef: { type: 'STRING' }
+              },
+              required: ['pillar', 'prompt', 'framework', 'sourceRef']
+            }
+          },
+          concept: {
+            type: 'OBJECT',
+            properties: {
+              title: { type: 'STRING' },
+              sourceName: { type: 'STRING' },
+              format: { type: 'STRING' },
+              url: { type: 'STRING' },
+              summary: { type: 'STRING' },
+              lens: { type: 'ARRAY', items: { type: 'STRING' } }
+            },
+            required: ['title', 'sourceName', 'format', 'url', 'summary', 'lens']
+          }
+        },
+        required: ['questions', 'concept']
+      };
+
       try {
-        const raw = await callUserLLM(prompt, false, true);
+        const raw = await callUserLLM(prompt, false, true, sessionSchema);
         const cleaned = String(raw || '').replace(/```json|```/gi, '').trim();
         let parsed = null;
         try {
@@ -1547,7 +1579,8 @@ Return ONLY valid JSON with this exact shape:
         saveState();
         state.activeNav = 'today';
         renderAll();
-        showToast('AI parse failed—loaded next curated session instead.');
+        logEvent('ai_session_error', err?.message || 'Unknown parse error');
+        showToast(`AI session error: ${err?.message || 'parse failed'} — loaded curated set.`);
       }
     }
 
