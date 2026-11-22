@@ -7,6 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <title>Daily 90m Growth Trainer — Product Lead & Universal Career Coach</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -574,6 +576,10 @@
       <p class="text-xs text-slate-600 leading-relaxed">
         This trainer is built as a mobile-first web app with local persistence. To use it like a native phone app:
       </p>
+      <button id="pwa-install-btn" type="button" class="hidden w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        Install App on This Device
+      </button>
       <ul class="text-xs text-slate-700 space-y-2 list-disc pl-4">
         <li><strong>iPhone (Safari):</strong> Open this page in Safari, tap the <strong>Share</strong> icon, and choose <strong>Add to Home Screen</strong>.</li>
         <li><strong>Android (Chrome):</strong> Tap the <strong>3-dot menu</strong> and choose <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
@@ -1508,10 +1514,21 @@ Return ONLY valid JSON with this exact shape:
 
       try {
         const raw = await callUserLLM(prompt, false, true);
-        const cleaned = raw.replace(/```json|```/g, '').trim();
-        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
-        if (parsed.questions?.length === 2 && parsed.concept) {
+        const cleaned = String(raw || '').replace(/```json|```/gi, '').trim();
+        let parsed = null;
+        try {
+          parsed = JSON.parse(cleaned);
+        } catch (e1) {
+          const start = cleaned.indexOf('{');
+          const end = cleaned.lastIndexOf('}');
+          if (start !== -1 && end > start) {
+            parsed = JSON.parse(cleaned.slice(start, end + 1));
+          } else {
+            throw e1;
+          }
+        }
+        if (Array.isArray(parsed)) parsed = parsed[0];
+        if (parsed && Array.isArray(parsed.questions) && parsed.questions.length >= 1 && parsed.concept) {
           state.todaySession = {
             questions: parsed.questions.map((q, i) => ({ ...q, id: `ai-${Date.now()}-${i}`, answer: '', feedback: '', done: false })),
             concept: { ...parsed.concept, id: `ai-c-${Date.now()}`, done: false }
@@ -1781,6 +1798,29 @@ Return ONLY valid JSON with this exact shape:
       msg.classList.remove('hidden');
       setTimeout(() => msg.classList.add('hidden'), 2500);
       showToast('Profile & AI settings saved!');
+    });
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const btn = document.getElementById('pwa-install-btn');
+      if (btn) btn.classList.remove('hidden');
+    });
+
+    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+      if (!deferredInstallPrompt) {
+        showToast('Use your browser menu -> Install app / Add to Home Screen.');
+        return;
+      }
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      document.getElementById('pwa-install-btn').classList.add('hidden');
+      if (choice?.outcome === 'accepted') {
+        document.getElementById('install-modal').classList.add('hidden');
+        showToast('App installed!');
+      }
     });
 
     document.getElementById('install-help-btn').addEventListener('click', () => {
