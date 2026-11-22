@@ -1,0 +1,9 @@
+{
+  "name": "Daily 90m Growth Trainer",
+  "short_name": "90m Trainer",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
+  "description": "Daily 90-minute career growth trainer: 45m practice, 30m concept, 15m application."
+}

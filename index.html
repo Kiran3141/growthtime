@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Daily 90m Growth Trainer — Product Lead & Universal Career Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .safe-pb {
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5rem);
+    }
+    @media (min-width: 768px) {
+      .safe-pb { padding-bottom: 2.5rem; }
+    }
+    .tab-active {
+      color: #4f46e5;
+    }
+    button, a, label[for], summary {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button, a[target="_blank"] {
+      min-height: 38px;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Top App Bar -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+          <i data-lucide="compass" class="w-4 h-4"></i>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-sm font-bold text-slate-900 truncate">Daily 90m Growth Trainer</h1>
+          <p id="header-role-label" class="text-[11px] font-medium text-slate-500 truncate">Senior PM / Product Lead</p>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+        <button data-nav="today" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Today (90m)</button>
+        <button data-nav="sources" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Sources</button>
+        <button data-nav="journal" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Journal</button>
+        <button data-nav="analytics" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Analytics</button>
+        <button data-nav="profile" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Profile &amp; Setup</button>
+      </nav>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <span id="streak-badge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold">
+          <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-500"></i>
+          <span id="streak-count">0</span>d
+        </span>
+        <button id="install-help-btn" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition" title="Use on Phone">
+          <i data-lucide="smartphone" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 pt-4 safe-pb">
+    <!-- ==================== TODAY TAB ==================== -->
+    <section id="view-today" class="space-y-4">
+      <!-- 90-Minute Session Master Bar -->
+      <div class="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="session-phase-pill" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
+                Block 1 of 3 • 45m Practice
+              </span>
+              <span id="ai-mode-pill" class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                Offline Starter Bank
+              </span>
+            </div>
+            <div class="mt-2 flex items-baseline gap-3">
+              <span id="timer-display" class="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums">45:00</span>
+              <span id="timer-subtext" class="text-xs text-slate-400">2 questions (~22.5 min each)</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="timer-toggle-btn" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">
+              <i data-lucide="play" class="w-3.5 h-3.5"></i>
+              <span id="timer-toggle-label">Start Block</span>
+            </button>
+            <button id="timer-reset-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              Reset
+            </button>
+            <button id="next-day-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition" title="Rotate to a fresh daily set">
+              <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+              New Set
+            </button>
+          </div>
+        </div>
+
+        <!-- 3-Block Stepper -->
+        <div class="mt-4 grid grid-cols-3 gap-2">
+          <button data-block="0" class="block-tab text-left p-2.5 rounded-xl border transition">
+            <div class="flex items-center justify-between text-[11px] font-semibold">
+              <span>1. Practice</span>
+              <span>45m</span>
+            </div>
+            <div class="text-[11px] opacity-80 truncate mt-0.5">2 Daily Questions</div>
+          </button>
+          <button data-block="1" class="block-tab text-left p-2.5 rounded-xl border transition">
+            <div class="flex items-center justify-between text-[11px] font-semibold">
+              <span>2. Concept</span>
+              <span>30m</span>
+            </div>
+            <div class="text-[11px] opacity-80 truncate mt-0.5">Read / Watch</div>
+          </button>
+          <button data-block="2" class="block-tab text-left p-2.5 rounded-xl border transition">
+            <div class="flex items-center justify-between text-[11px] font-semibold">
+              <span>3. Apply</span>
+              <span>15m</span>
+            </div>
+            <div class="text-[11px] opacity-80 truncate mt-0.5">Job / Idea / Study</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- BLOCK 1: 45-Minute 2-Question Practice -->
+      <div id="block-panel-0" class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Today's 2 Training Questions (45 min)</h2>
+          <span id="q-progress-text" class="text-xs font-semibold text-indigo-600">0 / 2 completed</span>
+        </div>
+
+        <div id="daily-questions-container" class="space-y-4"></div>
+      </div>
+
+      <!-- BLOCK 2: 30-Minute Read / Watch Concept -->
+      <div id="block-panel-1" class="hidden space-y-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span id="concept-format-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">30m Read</span>
+              <span id="concept-source-name" class="text-xs font-medium text-slate-500">SVPG</span>
+            </div>
+            <button id="complete-concept-btn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+              <span>Mark Concept Read</span>
+            </button>
+          </div>
+
+          <div>
+            <h2 id="concept-title" class="text-lg font-bold text-slate-900"></h2>
+            <p id="concept-summary" class="mt-2 text-sm text-slate-600 leading-relaxed"></p>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200/80 space-y-2">
+            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Leadership Lens &amp; Key Questions</h3>
+            <ul id="concept-lens-list" class="space-y-1.5 text-sm text-slate-700 list-disc pl-4"></ul>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <a id="concept-link" href="https://www.svpg.com/product-leadership-is-hard/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              Open Source Material
+            </a>
+            <button id="go-to-apply-btn" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition">
+              Continue to 15m Apply &amp; Note
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCK 3: 15-Minute Apply & Note -->
+      <div id="block-panel-2" class="hidden space-y-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <div>
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200">15m Synthesis &amp; Action</span>
+            <h2 class="mt-2 text-lg font-bold text-slate-900">Turn Today's Concept into Leverage</h2>
+            <p class="text-xs text-slate-500 mt-1">Choose how you want to apply today's reading/video and save a concrete action note.</p>
+          </div>
+
+          <!-- Application Mode Selector -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button data-apply-mode="job" class="apply-mode-btn p-3 rounded-xl border text-left transition">
+              <div class="text-xs font-bold">Apply at Work</div>
+              <div class="text-[11px] opacity-75 mt-0.5">Current team / roadmap</div>
+            </button>
+            <button data-apply-mode="idea" class="apply-mode-btn p-3 rounded-xl border text-left transition">
+              <div class="text-xs font-bold">New Idea</div>
+              <div class="text-[11px] opacity-75 mt-0.5">Product / side bet</div>
+            </button>
+            <button data-apply-mode="study" class="apply-mode-btn p-3 rounded-xl border text-left transition">
+              <div class="text-xs font-bold">Deep Study</div>
+              <div class="text-[11px] opacity-75 mt-0.5">Follow-up &amp; gaps</div>
+            </button>
+          </div>
+
+          <div id="apply-prompt-box" class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3.5 text-xs text-indigo-950 font-medium"></div>
+
+          <div>
+            <label for="apply-note-input" class="block text-xs font-semibold text-slate-700 mb-1.5">Your Action Note</label>
+            <textarea id="apply-note-input" rows="5" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Capture the core mental model, where it applies in your current role, and one concrete action for this week..."></textarea>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <button id="save-apply-note-btn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">
+              <i data-lucide="bookmark-check" class="w-4 h-4"></i>
+              Save to Journal &amp; Complete Day
+            </button>
+            <span id="apply-saved-status" class="text-xs font-medium text-emerald-600 hidden">Saved to Journal!</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SOURCES TAB ==================== -->
+    <section id="view-sources" class="hidden space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Your Knowledge &amp; Website Sources</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Plug in blogs, YouTube channels, Substacks, or notes. Your daily trainer pulls context from here.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="ai-generate-session-btn" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              Generate Session from Sources
+            </button>
+            <button id="export-data-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              Export JSON
+            </button>
+          </div>
+        </div>
+
+        <!-- Connected Google Drive Repository Banner -->
+        <div id="drive-repo-banner" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-indigo-50/70 border border-indigo-200 rounded-xl p-3">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-white border border-indigo-200 flex items-center justify-center shrink-0 text-indigo-600">
+              <i data-lucide="folder-git-2" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-slate-900 truncate">Drive Repository: <span id="sources-drive-label">Product</span></div>
+              <div id="sources-drive-url" class="text-[11px] text-slate-600 truncate">https://drive.google.com/drive/folders/1uTYaWv8x16N0653kevCJ6T_Q6UuyOUtr?usp=drive_link</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold cursor-pointer transition">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              Import File
+              <input id="drive-file-import" type="file" accept=".json,.md,.txt,.csv" class="hidden" />
+            </label>
+            <button id="check-drive-sync-btn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              Check &amp; Sync
+            </button>
+            <a id="sources-drive-open" href="https://drive.google.com/drive/folders/1uTYaWv8x16N0653kevCJ6T_Q6UuyOUtr?usp=drive_link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              Open Drive
+            </a>
+          </div>
+        </div>
+
+        <!-- Add New Source Form -->
+        <form id="add-source-form" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <input id="src-title" type="text" required placeholder="Source title (e.g., Reforge Blog)" class="sm:col-span-3 rounded-lg border border-slate-300 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <input id="src-url" type="url" required placeholder="https://..." class="sm:col-span-4 rounded-lg border border-slate-300 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <select id="src-type" class="sm:col-span-2 rounded-lg border border-slate-300 px-2.5 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="Read">Read</option>
+            <option value="Watch">Watch</option>
+            <option value="Notes">Notes</option>
+          </select>
+          <input id="src-notes" type="text" placeholder="Key topic / why it matters" class="sm:col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <button type="submit" class="sm:col-span-1 inline-flex items-center justify-center px-3 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+            Add
+          </button>
+        </form>
+
+        <!-- Sources List -->
+        <div id="sources-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+      </div>
+    </section>
+
+    <!-- ==================== JOURNAL TAB ==================== -->
+    <section id="view-journal" class="hidden space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Growth Journal &amp; Saved Answers</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Every practice answer, critique, and 15-minute job/idea application note.</p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button data-jfilter="all" class="jfilter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">All</button>
+            <button data-jfilter="question" class="jfilter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Questions</button>
+            <button data-jfilter="job" class="jfilter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Work</button>
+            <button data-jfilter="idea" class="jfilter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Ideas</button>
+            <button data-jfilter="study" class="jfilter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">Study</button>
+          </div>
+        </div>
+
+        <div id="journal-list" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ==================== ANALYTICS & LOGS TAB ==================== -->
+    <section id="view-analytics" class="hidden space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Daily Activity Analytics &amp; Usage Logs</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Track your consistency, pillar coverage, and every session action—locally or via your own webhook.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="export-logs-csv-btn" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+              Export Logs CSV
+            </button>
+            <button id="clear-logs-btn" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
+              Clear Logs
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Summary Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3.5">
+            <div class="text-[11px] font-semibold text-slate-500">Questions Done</div>
+            <div id="stat-questions" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
+          </div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3.5">
+            <div class="text-[11px] font-semibold text-slate-500">Concepts Read</div>
+            <div id="stat-concepts" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
+          </div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3.5">
+            <div class="text-[11px] font-semibold text-slate-500">Apply Notes</div>
+            <div id="stat-applies" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
+          </div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3.5">
+            <div class="text-[11px] font-semibold text-slate-500">Total Events Logged</div>
+            <div id="stat-events" class="text-2xl font-extrabold text-indigo-600 mt-1">0</div>
+          </div>
+        </div>
+
+        <!-- Activity Chart -->
+        <div class="rounded-xl border border-slate-200 p-4">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Activity Breakdown by Event Type</h3>
+          <div class="relative h-64">
+            <canvas id="analytics-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Timestamped Activity Log -->
+        <div>
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Recent Activity Log</h3>
+          <div id="activity-log-list" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PROFILE & SETUP TAB ==================== -->
+    <section id="view-profile" class="hidden space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Plug-and-Play Profession Setup</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Switch presets or customize for any career track. Everything updates your daily questions and concepts.</p>
+        </div>
+
+        <!-- Preset Switcher -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <button data-preset="pm_lead" class="preset-btn p-3.5 rounded-xl border text-left transition">
+            <div class="text-xs font-bold text-slate-900">Senior PM / Product Lead</div>
+            <div class="text-[11px] text-slate-500 mt-1">Sense, Strategy, Execution, Leadership, AI Systems</div>
+          </button>
+          <button data-preset="staff_eng" class="preset-btn p-3.5 rounded-xl border text-left transition">
+            <div class="text-xs font-bold text-slate-900">Staff / Principal Engineer</div>
+            <div class="text-[11px] text-slate-500 mt-1">System Design, Reliability, Tech Strategy, Mentoring</div>
+          </button>
+          <button data-preset="design_lead" class="preset-btn p-3.5 rounded-xl border text-left transition">
+            <div class="text-xs font-bold text-slate-900">Design Lead / UX Director</div>
+            <div class="text-[11px] text-slate-500 mt-1">Craft, Systems, Critique, Cross-Functional Influence</div>
+          </button>
+        </div>
+
+        <!-- Custom Role & Goal -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="profile-role-input" class="block text-xs font-semibold text-slate-700 mb-1">Target Role / Profession</label>
+            <input id="profile-role-input" type="text" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label for="profile-goal-input" class="block text-xs font-semibold text-slate-700 mb-1">90-Day Growth Goal</label>
+            <input id="profile-goal-input" type="text" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+
+        <!-- Question Type Pillars -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-2">Active Question Types in Daily Rotation</label>
+          <div id="pillar-toggles" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Google Drive / Cloud Repository -->
+        <div class="border-t border-slate-200 pt-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Google Drive Knowledge Repository</h3>
+              <p class="text-xs text-slate-500">Link a Google Drive folder where you keep your prep docs, case studies, books, or notes.</p>
+            </div>
+            <div class="flex items-center gap-2 self-start">
+              <button id="profile-check-drive-btn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold transition">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                Check Read Access
+              </button>
+              <a id="profile-drive-open" href="https://drive.google.com/drive/folders/1uTYaWv8x16N0653kevCJ6T_Q6UuyOUtr?usp=drive_link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition">
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                Open Drive Repo
+              </a>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label for="profile-drive-label" class="block text-xs font-semibold text-slate-700 mb-1">Repository Name</label>
+              <input id="profile-drive-label" type="text" placeholder="e.g., Product" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div class="sm:col-span-2">
+              <label for="profile-drive-url" class="block text-xs font-semibold text-slate-700 mb-1">Google Drive Folder URL</label>
+              <input id="profile-drive-url" type="url" placeholder="https://drive.google.com/drive/folders/..." class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Optional BYO AI API Key -->
+        <div class="border-t border-slate-200 pt-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Optional AI Engine (Secure Local Key)</h3>
+              <p class="text-xs text-slate-500">Stored only in your browser's local storage—never sent to any third-party server. Leave blank for Offline Starter Bank.</p>
+            </div>
+            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold transition self-start shrink-0">
+              <i data-lucide="key-round" class="w-3.5 h-3.5"></i>
+              Get Free Gemini Key
+            </a>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 space-y-1">
+            <div class="font-semibold text-slate-800">30-Second Setup Guide:</div>
+            <p>1. Click <strong>Get Free Gemini Key</strong> (Google AI Studio) &rarr; <strong>Create API key</strong>. 2. Select <strong>Google Gemini API</strong> below and paste it. 3. Click <strong>Test Key</strong> to verify.</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <select id="ai-provider-select" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="offline">Offline Starter Bank (No Key)</option>
+              <option value="gemini">Google Gemini API</option>
+              <option value="openai">OpenAI API</option>
+            </select>
+            <input id="ai-key-input" type="password" placeholder="Paste API key (stored locally in browser)" class="sm:col-span-2 rounded-xl border border-slate-300 px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <button id="test-ai-key-btn" type="button" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+              Test Key
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            <div>
+              <label for="ai-model-select" class="block text-xs font-semibold text-slate-700 mb-1">Model</label>
+              <select id="ai-model-select" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="gemini-3.8-flash">gemini-3.8-flash (Recommended)</option>
+                <option value="gemini-3.6-flash">gemini-3.6-flash</option>
+                <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+                <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite</option>
+                <option value="gemini-4-argon">gemini-4-argon</option>
+                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+                <option value="gemini-flash-latest">gemini-flash-latest</option>
+                <option value="gpt-4o-mini">gpt-4o-mini (OpenAI)</option>
+                <option value="custom">Custom model ID...</option>
+              </select>
+            </div>
+            <div>
+              <label for="ai-custom-model-input" class="block text-xs font-semibold text-slate-700 mb-1">Custom Model ID (optional)</label>
+              <input id="ai-custom-model-input" type="text" placeholder="e.g., gemini-3.8-flash" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <button id="fetch-models-btn" type="button" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold transition">
+              <i data-lucide="list-filter" class="w-3.5 h-3.5"></i>
+              Load My Models
+            </button>
+          </div>
+          <div id="ai-key-status" class="hidden text-xs font-medium px-3 py-2 rounded-lg"></div>
+          <div class="border-t border-slate-200 pt-4 space-y-2">
+            <label for="analytics-webhook-input" class="block text-xs font-bold text-slate-900">Optional Cloud Analytics Webhook (for GitHub Pages / Team Logs)</label>
+            <p class="text-xs text-slate-500">Paste an <code>https://</code> endpoint (e.g., Google Apps Script Web App, Pipedream, or Supabase) to also stream anonymized daily usage logs when hosted on GitHub Pages.</p>
+            <input id="analytics-webhook-input" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="save-profile-btn" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+              Save Profile &amp; Settings
+            </button>
+            <span id="profile-saved-msg" class="text-xs font-medium text-emerald-600 hidden">Settings saved!</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur border-t border-slate-200 px-2 py-1.5 flex items-center justify-around">
+    <button data-nav="today" class="nav-btn-mobile flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-[11px] font-semibold">
+      <i data-lucide="timer" class="w-4 h-4"></i>
+      <span>Today</span>
+    </button>
+    <button data-nav="sources" class="nav-btn-mobile flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-[11px] font-semibold">
+      <i data-lucide="globe" class="w-4 h-4"></i>
+      <span>Sources</span>
+    </button>
+    <button data-nav="journal" class="nav-btn-mobile flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-[11px] font-semibold">
+      <i data-lucide="book-open" class="w-4 h-4"></i>
+      <span>Journal</span>
+    </button>
+    <button data-nav="analytics" class="nav-btn-mobile flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-[11px] font-semibold">
+      <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+      <span>Logs</span>
+    </button>
+    <button data-nav="profile" class="nav-btn-mobile flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-[11px] font-semibold">
+      <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+      <span>Setup</span>
+    </button>
+  </nav>
+
+  <!-- Install / Toast Modal -->
+  <div id="install-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-3 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Use on Your Phone &amp; Desktop</h3>
+        <button id="close-install-modal" class="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        This trainer is built as a mobile-first web app with local persistence. To use it like a native phone app:
+      </p>
+      <ul class="text-xs text-slate-700 space-y-2 list-disc pl-4">
+        <li><strong>iPhone (Safari):</strong> Open this page in Safari, tap the <strong>Share</strong> icon, and choose <strong>Add to Home Screen</strong>.</li>
+        <li><strong>Android (Chrome):</strong> Tap the <strong>3-dot menu</strong> and choose <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
+        <li><strong>Browser Extension Next:</strong> Export your sources JSON anytime from the Sources tab to sync with a companion clipper extension.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Drive Permission & Sync Modal -->
+  <div id="drive-permission-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-3 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 id="drive-modal-title" class="text-base font-bold text-slate-900">Drive Read Permission Needed</h3>
+        <button id="close-drive-modal" class="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <p id="drive-modal-desc" class="text-xs text-slate-600 leading-relaxed"></p>
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2 text-xs text-slate-700">
+        <div class="font-bold text-slate-900">Choose the easiest way to connect:</div>
+        <ol class="list-decimal pl-4 space-y-1.5">
+          <li><strong>Direct Folder Sync:</strong> Open your Drive folder &rarr; <strong>Share</strong> &rarr; set General Access to <strong>Anyone with the link (Viewer)</strong>, and paste a Google API key with <strong>Google Drive API</strong> enabled in Setup.</li>
+          <li><strong>Keep Folder Private (Zero Config):</strong> Open your Drive folder, download or export any doc/notes (<code>.txt</code>, <code>.md</code>, <code>.json</code>, or <code>.csv</code>), and click <strong>Import File</strong> in the Sources tab.</li>
+        </ol>
+      </div>
+      <div class="flex justify-end gap-2 pt-1">
+        <a id="drive-modal-open-link" href="https://drive.google.com/drive/folders/1uTYaWv8x16N0653kevCJ6T_Q6UuyOUtr?usp=drive_link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+          Open Drive Folder
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export JSON Modal -->
+  <div id="export-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-3 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Exported Sources &amp; Journal JSON</h3>
+        <button id="close-export-modal" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-600">Your download has been triggered. You can also copy the JSON directly below:</p>
+      <textarea id="export-json-text" rows="8" readonly class="w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-[11px] font-mono text-slate-800 focus:outline-none"></textarea>
+      <div class="flex justify-end gap-2">
+        <button id="copy-export-json-btn" type="button" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+          Copy JSON
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden fixed bottom-20 md:bottom-6 right-4 z-50 bg-slate-900 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg"></div>
+
+  <script>
+    // ==================== STARTER DATA & PRESETS ====================
+    const PRESETS = {
+      pm_lead: {
+        role: 'Senior PM / Product Lead',
+        goal: 'Transition into Product Lead / Principal PM role with sharper strategy & executive presence',
+        pillars: ['Product Sense & Design', 'Product Strategy & Vision', 'Execution, Metrics & Root Cause', 'Leadership & Stakeholder Management', 'AI Product & Technical Architecture'],
+        activePillars: ['Product Sense & Design', 'Product Strategy & Vision', 'Execution, Metrics & Root Cause', 'Leadership & Stakeholder Management', 'AI Product & Technical Architecture']
+      },
+      staff_eng: {
+        role: 'Staff / Principal Engineer',
+        goal: 'Lead cross-team architecture, reliability, and high-leverage technical strategy',
+        pillars: ['System Architecture', 'Reliability & Trade-offs', 'Technical Strategy', 'Org Influence & Mentoring', 'AI Infrastructure'],
+        activePillars: ['System Architecture', 'Reliability & Trade-offs', 'Technical Strategy', 'Org Influence & Mentoring']
+      },
+      design_lead: {
+        role: 'Design Lead / UX Director',
+        goal: 'Elevate product craft, design systems, and executive storytelling',
+        pillars: ['Interaction & Product Craft', 'Design Systems & Scale', 'Critique & Direction', 'Cross-Functional Influence'],
+        activePillars: ['Interaction & Product Craft', 'Design Systems & Scale', 'Critique & Direction', 'Cross-Functional Influence']
+      }
+    };
+
+    const STARTER_SOURCES = [
+      {
+        id: 'drv-books',
+        title: 'Drive: Books (Product)',
+        url: 'https://drive.google.com/drive/folders/1OagqqrvjVe55GqQiV4ZqZ-QzPrJwGWNw',
+        type: 'Drive',
+        notes: 'Your Product Drive repository — Books subfolder.'
+      },
+      {
+        id: 'drv-case',
+        title: 'Drive: pm-case-practice',
+        url: 'https://drive.google.com/file/d/111qm8olGKjWTOhuBlMlcl5OjP5TFl1gq/view?usp=drivesdk',
+        type: 'Drive',
+        notes: 'Your Product Drive repository — PM case practice folder.'
+      },
+      {
+        id: 'drv-prep',
+        title: 'Drive: Prep docs',
+        url: 'https://drive.google.com/drive/folders/1H67i3S6lQmywM-y186GWjBJMFzmbg-oU',
+        type: 'Drive',
+        notes: 'Your Product Drive repository — Prep docs subfolder.'
+      },
+      {
+        id: 'drv-interviews',
+        title: 'Drive: PM Interviews',
+        url: 'https://drive.google.com/drive/folders/1FsLvJCq7yaOLwzM_tLoK8-npKlv-oy6Z',
+        type: 'Drive',
+        notes: 'Your Product Drive repository — PM Interviews subfolder.'
+      },
+      {
+        id: 'drv-resume',
+        title: 'Drive: Resume',
+        url: 'https://drive.google.com/drive/folders/1JTnu-9dWlOzjUC1OHFnAqU_Yo_0yoyrf',
+        type: 'Drive',
+        notes: 'Your Product Drive repository — Resume subfolder.'
+      },
+      {
+        id: 'src-1',
+        title: 'SVPG — Product Leadership Is Hard',
+        url: 'https://www.svpg.com/product-leadership-is-hard/',
+        type: 'Read',
+        notes: 'Coaching, team topology, and leading with context rather than control.'
+      },
+      {
+        id: 'src-2',
+        title: "Lenny's Newsletter — Strategy Blocks",
+        url: 'https://www.lennysnewsletter.com/p/strategy-blocks-an-operators-guide',
+        type: 'Read',
+        notes: 'Operator guide to connecting mission/vision to strategic pillars and roadmaps.'
+      },
+      {
+        id: 'src-3',
+        title: 'Stratechery — Aggregation Theory',
+        url: 'https://stratechery.com/2015/aggregation-theory/',
+        type: 'Read',
+        notes: 'How zero distribution cost and user demand reshape competitive moats.'
+      },
+      {
+        id: 'src-4',
+        title: "Lenny's Newsletter — Product Management Theater",
+        url: 'https://www.lennysnewsletter.com/p/product-management-theater-marty',
+        type: 'Read',
+        notes: 'Value + viability ownership vs. feature-factory output.'
+      }
+    ];
+
+    const STARTER_QUESTIONS = {
+      'Product Sense & Design': [
+        {
+          id: 'q-ps-1',
+          prompt: 'Design an AI-native onboarding experience for a B2B workflow tool where 60% of new signups drop off before inviting a second teammate.',
+          framework: '1) Clarify user segment & activation moment -> 2) Diagnose friction (solo value vs. multiplayer value) -> 3) Propose 2-3 high-leverage UX flows -> 4) Define guardrail & activation metrics.',
+          sourceRef: 'SVPG — Product Leadership Is Hard'
+        },
+        {
+          id: 'q-ps-2',
+          prompt: 'How would you redesign a daily learning or habit app so busy professionals consistently complete a 90-minute deep-work loop without notification fatigue?',
+          framework: '1) Core job-to-be-done -> 2) Motivation vs. friction curve -> 3) Loop mechanics (trigger, action, variable reward, reflection) -> 4) Trade-offs.',
+          sourceRef: "Lenny's Newsletter — Strategy Blocks"
+        }
+      ],
+      'Product Strategy & Vision': [
+        {
+          id: 'q-st-1',
+          prompt: 'Your company has a strong single-player SaaS tool, and an incumbent just bundled a free "good enough" version. Define your 12-month strategic response using explicit pillars and non-goals.',
+          framework: '1) Identify where the incumbent cannot follow (structural moat) -> 2) Pick 3 strategic pillars -> 3) List 2 explicit things you will NOT do -> 4) Explain resource allocation.',
+          sourceRef: "Lenny's Newsletter — Strategy Blocks"
+        },
+        {
+          id: 'q-st-2',
+          prompt: 'Using Aggregation Theory, evaluate whether a vertical marketplace you use today is a true Level 3 Aggregator or vulnerable to commoditization by AI agents.',
+          framework: '1) Demand ownership vs. supply exclusivity -> 2) Zero marginal cost test -> 3) Disintermediation risk from AI interfaces -> 4) Defensibility move.',
+          sourceRef: 'Stratechery — Aggregation Theory'
+        }
+      ],
+      'Execution, Metrics & Root Cause': [
+        {
+          id: 'q-ex-1',
+          prompt: 'Weekly Active Users (WAU) grew 14% month-over-month, but 30-day retention dropped 6 percentage points and support tickets spiked. Walk through your exact diagnostic plan.',
+          framework: '1) Segment by cohort, channel, and platform -> 2) Separate acquisition mix shift from product regression -> 3) Triangulate with ticket taxonomy -> 4) Ship short-term mitigation + long-term fix.',
+          sourceRef: "Lenny's Newsletter — Product Management Theater"
+        },
+        {
+          id: 'q-ex-2',
+          prompt: 'You have engineering capacity for only one major Q1 bet: improving core latency by 40% or launching a requested enterprise permissions suite. How do you decide and align leadership?',
+          framework: '1) Quantify revenue/retention impact of both -> 2) Check reversibility (Type 1 vs Type 2) -> 3) Define clear success thresholds -> 4) Stakeholder alignment narrative.',
+          sourceRef: 'SVPG — Product Leadership Is Hard'
+        }
+      ],
+      'Leadership & Stakeholder Management': [
+        {
+          id: 'q-ld-1',
+          prompt: 'Your CEO keeps dropping ad-hoc feature requests into the sprint, turning your squad into a feature factory. How do you shift the dynamic from output to outcomes in 30 days?',
+          framework: '1) Empathize with the CEO’s underlying business anxiety -> 2) Bring customer evidence & outcome framing -> 3) Propose a lightweight discovery cadence -> 4) Build trust via fast wins.',
+          sourceRef: "Lenny's Newsletter — Product Management Theater"
+        },
+        {
+          id: 'q-ld-2',
+          prompt: 'A senior PM on your team writes thorough PRDs but struggles to influence Engineering and Design without escalating to you. How do you coach them over 6 weeks?',
+          framework: '1) Diagnose root cause (context vs. credibility vs. listening) -> 2) Set observable behavior goals -> 3) Shadow & debrief 2 key meetings -> 4) Measure team autonomy.',
+          sourceRef: 'SVPG — Product Leadership Is Hard'
+        }
+      ],
+      'AI Product & Technical Architecture': [
+        {
+          id: 'q-ai-1',
+          prompt: 'You are adding an LLM copilot to a high-stakes enterprise product. How do you design the evaluation pipeline, latency budget, and human-in-the-loop fallback?',
+          framework: '1) Define acceptable error modes (hallucination vs. refusal) -> 2) Golden dataset + offline/online evals -> 3) Streaming/caching UX for latency -> 4) Confidence thresholds & escalation.',
+          sourceRef: 'AI Product Architecture'
+        },
+        {
+          id: 'q-ai-2',
+          prompt: 'When should a product team choose RAG + prompt engineering over fine-tuning a smaller model? Frame the trade-offs in cost, freshness, latency, and maintenance.',
+          framework: '1) Data freshness & citation needs -> 2) Latency & unit economics at scale -> 3) Engineering ownership & eval complexity -> 4) Phased rollout recommendation.',
+          sourceRef: 'AI Product Architecture'
+        }
+      ]
+    };
+
+    const STARTER_CONCEPTS = [
+      {
+        id: 'c-1',
+        title: 'Product Leadership Is Hard: Context Over Control',
+        sourceName: 'SVPG (Marty Cagan)',
+        format: '30m Read',
+        url: 'https://www.svpg.com/product-leadership-is-hard/',
+        summary: 'Strong product leaders spend up to half their week coaching and shaping team topology—loosely coupled, highly aligned squads—so teams own outcomes rather than executing top-down feature lists.',
+        lens: [
+          'Where is your current team waiting for permission instead of owning an outcome?',
+          'How clearly can every engineer on your squad articulate the product strategy in two sentences?',
+          'What coaching habit could you start in your next 1:1?'
+        ]
+      },
+      {
+        id: 'c-2',
+        title: 'Strategy Blocks: Bridging Vision and Execution',
+        sourceName: "Lenny's Newsletter",
+        format: '30m Read',
+        url: 'https://www.lennysnewsletter.com/p/strategy-blocks-an-operators-guide',
+        summary: 'Product strategy sits in the void between mission/vision and the roadmap. Great strategy forces disciplined choices: 3–5 strategic pillars, explicit non-goals, and clear reasoning for both.',
+        lens: [
+          'What are the 2 things your team should explicitly say NO to this quarter?',
+          'Does your current roadmap trace back to a coherent strategic pillar or stakeholder requests?',
+          'How would you pitch your team’s strategy to a new hire in 3 minutes?'
+        ]
+      },
+      {
+        id: 'c-3',
+        title: 'Aggregation Theory & Modern Moats',
+        sourceName: 'Stratechery (Ben Thompson)',
+        format: '30m Read',
+        url: 'https://stratechery.com/2015/aggregation-theory/',
+        summary: 'When distribution and transaction costs drop to zero, power shifts from owning scarce supply to owning the end-user relationship and demand—creating a virtuous cycle of better UX attracting more suppliers.',
+        lens: [
+          'In your market, who owns the direct user relationship vs. commoditized supply?',
+          'How do AI interfaces threaten or strengthen your product’s demand-side moat?',
+          'What proprietary workflow data compounds every time a user completes a task?'
+        ]
+      }
+    ];
+
+    const APPLY_PROMPTS = {
+      job: 'How can you apply today’s concept in a real meeting, PRD, roadmap review, or 1:1 at your job this week?',
+      idea: 'What new product feature, workflow, or side-project bet does today’s concept spark for you?',
+      study: 'What gap did today’s exercise reveal, and what specific topic or case study will you dig into next?'
+    };
+
+    // ==================== STATE MANAGEMENT ====================
+    const STORAGE_KEY = 'daily_growth_trainer_v1';
+
+    function loadState() {
+      const defaults = {
+        activeNav: 'today',
+        activeBlock: 0,
+        dayIndex: 0,
+        streak: 0,
+        lastCompletedDate: null,
+        profile: {
+          ...PRESETS.pm_lead,
+          presetKey: 'pm_lead',
+          driveRepoLabel: 'Product',
+          driveRepoUrl: 'https://drive.google.com/drive/folders/1uTYaWv8x16N0653kevCJ6T_Q6UuyOUtr?usp=drive_link'
+        },
+        aiConfig: { provider: 'offline', apiKey: '', model: 'gemini-3.8-flash' },
+        sources: [...STARTER_SOURCES],
+        journal: [],
+        todaySession: null,
+        applyMode: 'job',
+        journalFilter: 'all',
+        analyticsWebhook: '',
+        activityLogs: []
+      };
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaults;
+        const parsed = JSON.parse(raw);
+        const merged = { ...defaults, ...parsed, profile: { ...defaults.profile, ...(parsed.profile || {}) } };
+        if (!merged.aiConfig || !merged.aiConfig.model || merged.aiConfig.model === 'gemini-2.5-flash') {
+          merged.aiConfig = { ...(merged.aiConfig || {}), model: 'gemini-3.8-flash' };
+        }
+        if (!merged.profile.driveRepoUrl) {
+          merged.profile.driveRepoLabel = defaults.profile.driveRepoLabel;
+          merged.profile.driveRepoUrl = defaults.profile.driveRepoUrl;
+        }
+        return merged;
+      } catch (e) {
+        return defaults;
+      }
+    }
+
+    let state = loadState();
+
+    function logEvent(type, detail) {
+      const entry = {
+        id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        ts: new Date().toISOString(),
+        date: new Date().toLocaleString(),
+        role: state.profile.role,
+        type,
+        detail: String(detail || '')
+      };
+      state.activityLogs = [entry, ...(state.activityLogs || [])].slice(0, 500);
+      saveState();
+      if (state.analyticsWebhook && state.analyticsWebhook.startsWith('https://')) {
+        try {
+          fetch(state.analyticsWebhook, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(entry)
+          }).catch(() => {});
+        } catch (e) {}
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignore storage quota or sandbox restrictions
+      }
+    }
+
+    // Build or fetch today's 2-question + 1-concept session
+    function buildSessionFromBank(dayIdx) {
+      const activePillars = state.profile.activePillars.length
+        ? state.profile.activePillars
+        : state.profile.pillars;
+
+      const q1Pillar = activePillars[dayIdx % activePillars.length] || 'Product Sense & Design';
+      const q2Pillar = activePillars[(dayIdx + 1) % activePillars.length] || 'Product Strategy & Vision';
+
+      const pickQuestion = (pillar, offset) => {
+        const pool = STARTER_QUESTIONS[pillar];
+        if (pool && pool.length) {
+          const item = pool[(dayIdx + offset) % pool.length];
+          return { ...item, pillar, answer: '', feedback: '', done: false };
+        }
+        const src = state.sources[dayIdx % Math.max(1, state.sources.length)];
+        return {
+          id: `custom-${pillar}-${dayIdx}-${offset}`,
+          pillar,
+          prompt: `As a ${state.profile.role}, analyze a high-stakes trade-off in "${pillar}" informed by ${src ? src.title : 'your target domain'}. Outline your options, risks, and decision criteria.`,
+          framework: '1) Context & constraints -> 2) Options & trade-offs -> 3) Recommendation & metrics.',
+          sourceRef: src ? src.title : state.profile.role,
+          answer: '',
+          feedback: '',
+          done: false
+        };
+      };
+
+      const concept = STARTER_CONCEPTS[dayIdx % STARTER_CONCEPTS.length];
+      return {
+        questions: [pickQuestion(q1Pillar, 0), pickQuestion(q2Pillar, 1)],
+        concept: { ...concept, done: false }
+      };
+    }
+
+    if (!state.todaySession) {
+      state.todaySession = buildSessionFromBank(state.dayIndex);
+      saveState();
+    }
+
+    // ==================== TIMER ENGINE ====================
+    const BLOCK_DURATIONS = [45 * 60, 30 * 60, 15 * 60];
+    const BLOCK_LABELS = [
+      { pill: 'Block 1 of 3 • 45m Practice', sub: '2 questions (~22.5 min each)' },
+      { pill: 'Block 2 of 3 • 30m Concept', sub: 'Read or watch & extract mental models' },
+      { pill: 'Block 3 of 3 • 15m Apply', sub: 'Note & apply to job, idea, or study' }
+    ];
+
+    let timerSeconds = BLOCK_DURATIONS[state.activeBlock];
+    let timerInterval = null;
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      document.getElementById('timer-toggle-label').textContent = 'Start Block';
+    }
+
+    function toggleTimer() {
+      if (timerInterval) {
+        stopTimer();
+        return;
+      }
+      document.getElementById('timer-toggle-label').textContent = 'Pause';
+      timerInterval = setInterval(() => {
+        if (timerSeconds > 0) {
+          timerSeconds -= 1;
+          document.getElementById('timer-display').textContent = formatTime(timerSeconds);
+        } else {
+          stopTimer();
+          showToast('Block timer complete! Ready for the next block.');
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      stopTimer();
+      timerSeconds = BLOCK_DURATIONS[state.activeBlock];
+      document.getElementById('timer-display').textContent = formatTime(timerSeconds);
+    }
+
+    // ==================== UI HELPERS ====================
+    function copyTextFallback(text) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).catch(() => {});
+          return true;
+        }
+      } catch (e) {}
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 3000);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    function renderHeaderAndNav() {
+      document.getElementById('header-role-label').textContent = state.profile.role;
+      document.getElementById('streak-count').textContent = state.streak;
+
+      const aiPill = document.getElementById('ai-mode-pill');
+      if (state.aiConfig.provider !== 'offline' && state.aiConfig.apiKey.trim()) {
+        aiPill.textContent = state.aiConfig.provider === 'gemini' ? 'Gemini AI Connected' : 'OpenAI Connected';
+      } else {
+        aiPill.textContent = 'Offline Starter Bank';
+      }
+
+      ['today', 'sources', 'journal', 'analytics', 'profile'].forEach((view) => {
+        document.getElementById(`view-${view}`).classList.toggle('hidden', state.activeNav !== view);
+      });
+
+      document.querySelectorAll('.nav-btn').forEach((btn) => {
+        const active = btn.dataset.nav === state.activeNav;
+        btn.className = `nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+          active ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+        }`;
+      });
+
+      document.querySelectorAll('.nav-btn-mobile').forEach((btn) => {
+        const active = btn.dataset.nav === state.activeNav;
+        btn.className = `nav-btn-mobile flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-[11px] font-semibold ${
+          active ? 'text-indigo-600' : 'text-slate-500'
+        }`;
+      });
+    }
+
+    function renderBlocks() {
+      const idx = state.activeBlock;
+      document.getElementById('session-phase-pill').textContent = BLOCK_LABELS[idx].pill;
+      document.getElementById('timer-subtext').textContent = BLOCK_LABELS[idx].sub;
+      document.getElementById('timer-display').textContent = formatTime(timerSeconds);
+
+      document.querySelectorAll('.block-tab').forEach((tab) => {
+        const b = Number(tab.dataset.block);
+        const active = b === idx;
+        tab.className = `block-tab text-left p-2.5 rounded-xl border transition ${
+          active
+            ? 'bg-indigo-600 border-indigo-400 text-white shadow-sm'
+            : 'bg-slate-800/70 border-slate-700 text-slate-300 hover:bg-slate-800'
+        }`;
+      });
+
+      [0, 1, 2].forEach((b) => {
+        document.getElementById(`block-panel-${b}`).classList.toggle('hidden', b !== idx);
+      });
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('daily-questions-container');
+      const qs = state.todaySession.questions;
+      const doneCount = qs.filter((q) => q.done).length;
+      document.getElementById('q-progress-text').textContent = `${doneCount} / ${qs.length} completed`;
+
+      container.innerHTML = qs
+        .map(
+          (q, idx) => `
+        <div class="bg-white rounded-2xl border ${q.done ? 'border-emerald-300' : 'border-slate-200'} p-4 sm:p-5 shadow-sm space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Q${idx + 1} • ${escapeHtml(q.pillar)}</span>
+              <span class="text-[11px] text-slate-500">Source: ${escapeHtml(q.sourceRef)}</span>
+            </div>
+            <button data-q-done="${idx}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border transition ${
+              q.done
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+            }">
+              ${q.done ? 'Completed' : 'Mark Complete'}
+            </button>
+          </div>
+
+          <p class="text-sm sm:text-base font-semibold text-slate-900 leading-snug">${escapeHtml(q.prompt)}</p>
+
+          <details class="text-xs text-slate-600 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200/70">
+            <summary class="font-semibold text-slate-700 cursor-pointer">Suggested Structure / Leadership Lens</summary>
+            <p class="mt-1.5 leading-relaxed">${escapeHtml(q.framework)}</p>
+          </details>
+
+          <textarea data-q-answer="${idx}" rows="4" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Write your structured answer here (goal: ~22 mins per question)...">${escapeHtml(q.answer)}</textarea>
+
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <button data-q-critique="${idx}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+                Get Critique
+              </button>
+              <button data-q-save="${idx}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition">
+                Save to Journal
+              </button>
+            </div>
+          </div>
+
+          ${
+            q.feedback
+              ? `<div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-950 whitespace-pre-line leading-relaxed">${escapeHtml(q.feedback)}</div>`
+              : ''
+          }
+        </div>
+      `
+        )
+        .join('');
+    }
+
+    function renderConcept() {
+      const c = state.todaySession.concept;
+      document.getElementById('concept-format-badge').textContent = c.format || '30m Read';
+      document.getElementById('concept-source-name').textContent = c.sourceName;
+      document.getElementById('concept-title').textContent = c.title;
+      document.getElementById('concept-summary').textContent = c.summary;
+      document.getElementById('concept-link').href = c.url;
+
+      const lensList = document.getElementById('concept-lens-list');
+      lensList.innerHTML = (c.lens || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+
+      const btn = document.getElementById('complete-concept-btn');
+      btn.className = `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition ${
+        c.done
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+      }`;
+      btn.querySelector('span').textContent = c.done ? 'Concept Completed' : 'Mark Concept Read';
+    }
+
+    function renderApply() {
+      document.querySelectorAll('.apply-mode-btn').forEach((btn) => {
+        const active = btn.dataset.applyMode === state.applyMode;
+        btn.className = `apply-mode-btn p-3 rounded-xl border text-left transition ${
+          active
+            ? 'bg-indigo-50 border-indigo-400 text-indigo-900 shadow-xs'
+            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+        }`;
+      });
+      document.getElementById('apply-prompt-box').textContent = APPLY_PROMPTS[state.applyMode];
+    }
+
+    function renderSources() {
+      const repoLabel = state.profile.driveRepoLabel || 'Google Drive Repository';
+      const repoUrl = state.profile.driveRepoUrl || 'https://drive.google.com';
+      document.getElementById('sources-drive-label').textContent = repoLabel;
+      document.getElementById('sources-drive-url').textContent = repoUrl;
+      document.getElementById('sources-drive-open').href = repoUrl;
+      const list = document.getElementById('sources-list');
+      if (!state.sources.length) {
+        list.innerHTML = '<p class="text-xs text-slate-500 col-span-2">No sources yet. Add a website, Substack, or YouTube channel above.</p>';
+        return;
+      }
+      list.innerHTML = state.sources
+        .map(
+          (src) => `
+        <div class="rounded-xl border border-slate-200 p-3.5 flex flex-col justify-between gap-2 bg-slate-50/50">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 mb-1">${escapeHtml(src.type)}</span>
+              <h3 class="text-sm font-bold text-slate-900 truncate">${escapeHtml(src.title)}</h3>
+              <p class="text-xs text-slate-600 line-clamp-2 mt-0.5">${escapeHtml(src.notes || 'Custom training source')}</p>
+            </div>
+            <button data-remove-src="${escapeHtml(src.id)}" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-semibold" title="Remove source">✕</button>
+          </div>
+          <a href="${escapeHtml(src.url)}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-medium text-indigo-600 hover:underline truncate">${escapeHtml(src.url)}</a>
+        </div>
+      `
+        )
+        .join('');
+    }
+
+    function renderJournal() {
+      document.querySelectorAll('.jfilter-btn').forEach((btn) => {
+        const active = btn.dataset.jfilter === state.journalFilter;
+        btn.className = `jfilter-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+          active ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+        }`;
+      });
+
+      const list = document.getElementById('journal-list');
+      const items = state.journal.filter((entry) =>
+        state.journalFilter === 'all' ? true : entry.category === state.journalFilter
+      );
+
+      if (!items.length) {
+        list.innerHTML = '<div class="text-center py-8 text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl">No saved entries in this view yet. Complete a question or 15-minute apply note in Today to log your progress!</div>';
+        return;
+      }
+
+      list.innerHTML = items
+        .map(
+          (entry) => `
+        <div class="rounded-xl border border-slate-200 p-4 space-y-2 bg-slate-50/40">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-indigo-50 text-indigo-700 border border-indigo-200">${escapeHtml(entry.category)}</span>
+              <span class="text-xs font-semibold text-slate-700">${escapeHtml(entry.title)}</span>
+            </div>
+            <span class="text-[11px] text-slate-400">${escapeHtml(entry.date)}</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed">${escapeHtml(entry.content)}</p>
+        </div>
+      `
+        )
+        .join('');
+    }
+
+    function renderProfile() {
+      document.querySelectorAll('.preset-btn').forEach((btn) => {
+        const active = btn.dataset.preset === state.profile.presetKey;
+        btn.className = `preset-btn p-3.5 rounded-xl border text-left transition ${
+          active ? 'bg-indigo-50 border-indigo-400 ring-1 ring-indigo-300' : 'bg-white border-slate-200 hover:bg-slate-50'
+        }`;
+      });
+
+      document.getElementById('profile-role-input').value = state.profile.role;
+      document.getElementById('profile-goal-input').value = state.profile.goal;
+      document.getElementById('profile-drive-label').value = state.profile.driveRepoLabel || '';
+      document.getElementById('profile-drive-url').value = state.profile.driveRepoUrl || '';
+      document.getElementById('profile-drive-open').href = state.profile.driveRepoUrl || 'https://drive.google.com';
+      document.getElementById('ai-provider-select').value = state.aiConfig.provider;
+      document.getElementById('ai-key-input').value = state.aiConfig.apiKey;
+      document.getElementById('analytics-webhook-input').value = state.analyticsWebhook || '';
+      const savedModel = state.aiConfig.model || 'gemini-3.8-flash';
+      const modelSel = document.getElementById('ai-model-select');
+      const hasOption = Array.from(modelSel.options).some((o) => o.value === savedModel);
+      modelSel.value = hasOption ? savedModel : 'custom';
+      document.getElementById('ai-custom-model-input').value = hasOption ? '' : savedModel;
+
+      const toggles = document.getElementById('pillar-toggles');
+      toggles.innerHTML = state.profile.pillars
+        .map((pillar) => {
+          const active = state.profile.activePillars.includes(pillar);
+          return `
+          <button type="button" data-toggle-pillar="${escapeHtml(pillar)}" class="px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
+            active
+              ? 'bg-indigo-600 text-white border-indigo-600'
+              : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
+          }">
+            ${escapeHtml(pillar)}
+          </button>
+        `;
+        })
+        .join('');
+    }
+
+    let analyticsChartInstance = null;
+
+    function renderAnalytics() {
+      const logs = state.activityLogs || [];
+      const qCount = logs.filter((l) => l.type === 'question_completed' || l.type === 'question_saved').length;
+      const cCount = logs.filter((l) => l.type === 'concept_completed').length;
+      const aCount = logs.filter((l) => l.type === 'apply_note_saved').length;
+
+      document.getElementById('stat-questions').textContent = qCount;
+      document.getElementById('stat-concepts').textContent = cCount;
+      document.getElementById('stat-applies').textContent = aCount;
+      document.getElementById('stat-events').textContent = logs.length;
+
+      const listEl = document.getElementById('activity-log-list');
+      if (!logs.length) {
+        listEl.innerHTML = '<div class="text-xs text-slate-500 p-4 border border-dashed border-slate-200 rounded-xl text-center">No activity logged yet. Start a timer, complete a question, or save a note to see live logs here.</div>';
+      } else {
+        listEl.innerHTML = logs
+          .slice(0, 60)
+          .map(
+            (l) => `
+          <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 px-3.5 py-2.5 bg-slate-50/50 text-xs">
+            <div class="min-w-0">
+              <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mr-1.5">${escapeHtml(l.type)}</span>
+              <span class="text-slate-800 font-medium">${escapeHtml(l.detail)}</span>
+            </div>
+            <span class="text-[11px] text-slate-400 shrink-0">${escapeHtml(l.date)}</span>
+          </div>`
+          )
+          .join('');
+      }
+
+      if (window.Chart && document.getElementById('analytics-chart')) {
+        const counts = {};
+        logs.forEach((l) => { counts[l.type] = (counts[l.type] || 0) + 1; });
+        const labels = Object.keys(counts);
+        const values = Object.values(counts);
+        if (analyticsChartInstance) {
+          analyticsChartInstance.destroy();
+          analyticsChartInstance = null;
+        }
+        analyticsChartInstance = new window.Chart(document.getElementById('analytics-chart'), {
+          type: 'bar',
+          data: {
+            labels: labels.length ? labels : ['No events yet'],
+            datasets: [{
+              label: 'Events',
+              data: values.length ? values : [0],
+              backgroundColor: '#4f46e5',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          }
+        });
+      }
+    }
+
+    function renderAll() {
+      renderHeaderAndNav();
+      renderBlocks();
+      renderQuestions();
+      renderConcept();
+      renderApply();
+      renderSources();
+      renderJournal();
+      renderAnalytics();
+      renderProfile();
+      try {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      } catch (err) {
+        // Ignore icon rendering errors
+      }
+    }
+
+    // ==================== AI & CRITIQUE LOGIC ====================
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...options, signal: controller.signal });
+      } catch (err) {
+        if (err && err.name === 'AbortError') {
+          throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)}s`);
+        }
+        throw err;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function callUserLLM(promptText, singleModelOnly = false, jsonMode = false) {
+      const { provider, apiKey } = state.aiConfig;
+      if (!apiKey || provider === 'offline') return null;
+
+      if (provider === 'gemini') {
+        const rawModel = state.aiConfig.model;
+        const preferred = (rawModel && rawModel !== 'gpt-4o-mini' && rawModel !== 'gemini-2.5-flash') ? rawModel : 'gemini-3.8-flash';
+        const models = singleModelOnly
+          ? Array.from(new Set([preferred, 'gemini-3.6-flash', 'gemini-3.5-flash-lite']))
+          : Array.from(new Set([preferred, 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest']));
+        let lastErr = 'Gemini API error';
+        for (const model of models) {
+          const res = await fetchWithTimeout(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey.trim())}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: promptText }] }],
+                ...(jsonMode ? { generationConfig: { responseMimeType: 'application/json' } } : {})
+              })
+            },
+            8000
+          );
+          const data = await res.json().catch(() => ({}));
+          if (res.ok) {
+            state.aiConfig.model = model;
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || 'OK';
+          }
+          lastErr = data.error?.message || `HTTP ${res.status}`;
+          if (![404, 429, 500, 503].includes(res.status)) break;
+        }
+        throw new Error(lastErr);
+      }
+
+      if (provider === 'openai') {
+        const model = state.aiConfig.model && state.aiConfig.model.startsWith('gpt') ? state.aiConfig.model : 'gpt-4o-mini';
+        const res = await fetchWithTimeout(
+          'https://api.openai.com/v1/chat/completions',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${apiKey.trim()}`
+            },
+            body: JSON.stringify({
+              model,
+              messages: [{ role: 'user', content: promptText }]
+            })
+          },
+          10000
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+        return data.choices?.[0]?.message?.content || '';
+      }
+      return null;
+    }
+
+    async function handleCritique(idx) {
+      const q = state.todaySession.questions[idx];
+      if (!q.answer.trim()) {
+        showToast('Write your answer first before requesting a critique.');
+        return;
+      }
+
+      if (state.aiConfig.provider !== 'offline' && state.aiConfig.apiKey.trim()) {
+        q.feedback = 'Generating critique from your connected AI model...';
+        renderQuestions();
+        try {
+          const reply = await callUserLLM(
+            `You are a Principal Product Leader coaching a candidate for "${state.profile.role}".\nQuestion (${q.pillar}): ${q.prompt}\nCandidate Answer:\n${q.answer}\n\nGive a concise, high-signal critique: 2 strengths, 2 blind spots or trade-offs missed, and 1 executive-level upgrade.`
+          );
+          q.feedback = reply || 'No feedback returned.';
+        } catch (err) {
+          q.feedback = 'Could not reach the AI API (check your key in Setup). Showing offline rubric instead:\n• Did you state explicit trade-offs and non-goals?\n• Did you define a north-star metric + guardrail metric?\n• Is your recommendation clear in the first 2 sentences?';
+        }
+      } else {
+        const wordCount = q.answer.trim().split(/\s+/).length;
+        q.feedback = `Offline Leadership Rubric (${wordCount} words):\n• Clarity & Structure: Did you lead with the core hypothesis before diving into details?\n• Trade-offs: Did you explicitly state what you are NOT doing and why?\n• Metrics: Did you pair an outcome metric with a guardrail metric?\nTip: Add an API key in Setup anytime for live tailored critiques.`;
+      }
+      saveState();
+      renderQuestions();
+    }
+
+    async function generateSessionFromSources() {
+      if (state.aiConfig.provider === 'offline' || !state.aiConfig.apiKey.trim()) {
+        state.dayIndex += 1;
+        state.todaySession = buildSessionFromBank(state.dayIndex);
+        saveState();
+        state.activeNav = 'today';
+        state.activeBlock = 0;
+        resetTimer();
+        renderAll();
+        showToast('Rotated to a fresh offline session using your active pillars!');
+        return;
+      }
+
+      showToast('Generating custom session from your sources...');
+      const sourceSummary = state.sources.map((s) => `- ${s.title} (${s.url}): ${s.notes}`).join('\n');
+      const pillars = state.profile.activePillars.join(', ');
+      const prompt = `Create a daily 90-minute training session for a "${state.profile.role}" (Goal: ${state.profile.goal}).
+Use these plugged-in sources as inspiration:
+${sourceSummary}
+
+Return ONLY valid JSON with this exact shape:
+{
+  "questions": [
+    {"pillar": "one of [${pillars}]", "prompt": "...", "framework": "...", "sourceRef": "source title"},
+    {"pillar": "another from [${pillars}]", "prompt": "...", "framework": "...", "sourceRef": "source title"}
+  ],
+  "concept": {
+    "title": "...",
+    "sourceName": "...",
+    "format": "30m Read",
+    "url": "exact url from sources above",
+    "summary": "2-3 sentence summary",
+    "lens": ["question 1", "question 2", "question 3"]
+  }
+}`;
+
+      try {
+        const raw = await callUserLLM(prompt, false, true);
+        const cleaned = raw.replace(/```json|```/g, '').trim();
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
+        if (parsed.questions?.length === 2 && parsed.concept) {
+          state.todaySession = {
+            questions: parsed.questions.map((q, i) => ({ ...q, id: `ai-${Date.now()}-${i}`, answer: '', feedback: '', done: false })),
+            concept: { ...parsed.concept, id: `ai-c-${Date.now()}`, done: false }
+          };
+          saveState();
+          state.activeNav = 'today';
+          state.activeBlock = 0;
+          resetTimer();
+          renderAll();
+          logEvent('ai_session_generated', state.aiConfig.model || 'gemini');
+          showToast('Generated fresh AI session from your sources!');
+        }
+      } catch (err) {
+        state.dayIndex += 1;
+        state.todaySession = buildSessionFromBank(state.dayIndex);
+        saveState();
+        state.activeNav = 'today';
+        renderAll();
+        showToast('AI parse failed—loaded next curated session instead.');
+      }
+    }
+
+    // ==================== EVENT WIRING ====================
+    document.addEventListener('click', (e) => {
+      const navBtn = e.target.closest('[data-nav]');
+      if (navBtn) {
+        state.activeNav = navBtn.dataset.nav;
+        saveState();
+        renderAll();
+        return;
+      }
+
+      const blockTab = e.target.closest('[data-block]');
+      if (blockTab) {
+        state.activeBlock = Number(blockTab.dataset.block);
+        saveState();
+        resetTimer();
+        renderBlocks();
+        return;
+      }
+
+      const qDone = e.target.closest('[data-q-done]');
+      if (qDone) {
+        const idx = Number(qDone.dataset.qDone);
+        state.todaySession.questions[idx].done = !state.todaySession.questions[idx].done;
+        if (state.todaySession.questions[idx].done) logEvent('question_completed', state.todaySession.questions[idx].pillar);
+        saveState();
+        renderQuestions();
+        return;
+      }
+
+      const qCrit = e.target.closest('[data-q-critique]');
+      if (qCrit) {
+        handleCritique(Number(qCrit.dataset.qCritique));
+        return;
+      }
+
+      const qSave = e.target.closest('[data-q-save]');
+      if (qSave) {
+        const idx = Number(qSave.dataset.qSave);
+        const q = state.todaySession.questions[idx];
+        if (!q.answer.trim()) {
+          showToast('Write an answer before saving to your Journal.');
+          return;
+        }
+        state.journal.unshift({
+          id: `j-${Date.now()}`,
+          category: 'question',
+          title: `${q.pillar}: ${q.prompt.slice(0, 65)}...`,
+          content: q.answer + (q.feedback ? `\n\n--- Critique ---\n${q.feedback}` : ''),
+          date: new Date().toLocaleDateString()
+        });
+        q.done = true;
+        saveState();
+        renderAll();
+        showToast('Answer saved to Journal!');
+        return;
+      }
+
+      const applyBtn = e.target.closest('[data-apply-mode]');
+      if (applyBtn) {
+        state.applyMode = applyBtn.dataset.applyMode;
+        saveState();
+        renderApply();
+        return;
+      }
+
+      const rmSrc = e.target.closest('[data-remove-src]');
+      if (rmSrc) {
+        state.sources = state.sources.filter((s) => s.id !== rmSrc.dataset.removeSrc);
+        saveState();
+        renderSources();
+        showToast('Source removed.');
+        return;
+      }
+
+      const jFilter = e.target.closest('[data-jfilter]');
+      if (jFilter) {
+        state.journalFilter = jFilter.dataset.jfilter;
+        saveState();
+        renderJournal();
+        return;
+      }
+
+      const presetBtn = e.target.closest('[data-preset]');
+      if (presetBtn) {
+        const key = presetBtn.dataset.preset;
+        state.profile = {
+          ...PRESETS[key],
+          presetKey: key,
+          driveRepoLabel: state.profile.driveRepoLabel,
+          driveRepoUrl: state.profile.driveRepoUrl
+        };
+        state.todaySession = buildSessionFromBank(state.dayIndex);
+        saveState();
+        renderAll();
+        showToast(`Switched profile to ${state.profile.role}`);
+        return;
+      }
+
+      const pillarBtn = e.target.closest('[data-toggle-pillar]');
+      if (pillarBtn) {
+        const p = pillarBtn.dataset.togglePillar;
+        const list = state.profile.activePillars;
+        if (list.includes(p)) {
+          if (list.length > 1) {
+            state.profile.activePillars = list.filter((x) => x !== p);
+          } else {
+            showToast('Keep at least one active question type.');
+          }
+        } else {
+          state.profile.activePillars = [...list, p];
+        }
+        saveState();
+        renderProfile();
+        return;
+      }
+    });
+
+    document.addEventListener('input', (e) => {
+      if (e.target.matches('[data-q-answer]')) {
+        const idx = Number(e.target.dataset.qAnswer);
+        state.todaySession.questions[idx].answer = e.target.value;
+        saveState();
+      }
+    });
+
+    document.getElementById('timer-toggle-btn').addEventListener('click', toggleTimer);
+    document.getElementById('timer-reset-btn').addEventListener('click', resetTimer);
+    document.getElementById('next-day-btn').addEventListener('click', () => {
+      state.dayIndex += 1;
+      state.todaySession = buildSessionFromBank(state.dayIndex);
+      saveState();
+      resetTimer();
+      renderAll();
+      showToast('Loaded a fresh pair of questions & concept!');
+    });
+
+    document.getElementById('complete-concept-btn').addEventListener('click', () => {
+      state.todaySession.concept.done = !state.todaySession.concept.done;
+      if (state.todaySession.concept.done) logEvent('concept_completed', state.todaySession.concept.title);
+      saveState();
+      renderConcept();
+    });
+
+    document.getElementById('go-to-apply-btn').addEventListener('click', () => {
+      state.activeBlock = 2;
+      saveState();
+      resetTimer();
+      renderBlocks();
+    });
+
+    document.getElementById('save-apply-note-btn').addEventListener('click', () => {
+      const text = document.getElementById('apply-note-input').value.trim();
+      if (!text) {
+        showToast('Write a quick action note first.');
+        return;
+      }
+      state.journal.unshift({
+        id: `j-${Date.now()}`,
+        category: state.applyMode,
+        title: `Applied "${state.todaySession.concept.title}"`,
+        content: text,
+        date: new Date().toLocaleDateString()
+      });
+      const todayStr = new Date().toDateString();
+      if (state.lastCompletedDate !== todayStr) {
+        state.streak += 1;
+        state.lastCompletedDate = todayStr;
+      }
+      document.getElementById('apply-note-input').value = '';
+      document.getElementById('apply-saved-status').classList.remove('hidden');
+      setTimeout(() => document.getElementById('apply-saved-status').classList.add('hidden'), 2500);
+      saveState();
+      renderAll();
+      logEvent('apply_note_saved', `${state.applyMode}: ${state.todaySession.concept.title}`);
+      showToast('Day completed & note saved to Journal!');
+    });
+
+    document.getElementById('add-source-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('src-title').value.trim();
+      const url = document.getElementById('src-url').value.trim();
+      const type = document.getElementById('src-type').value;
+      const notes = document.getElementById('src-notes').value.trim();
+      state.sources.unshift({ id: `src-${Date.now()}`, title, url, type, notes });
+      e.target.reset();
+      saveState();
+      renderSources();
+      logEvent('source_added', title);
+      showToast('Source added to your knowledge hub!');
+    });
+
+    document.getElementById('ai-generate-session-btn').addEventListener('click', generateSessionFromSources);
+
+    document.getElementById('export-data-btn').addEventListener('click', () => {
+      const payload = JSON.stringify({ profile: state.profile, sources: state.sources, journal: state.journal }, null, 2);
+      try {
+        const blob = new Blob([payload], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'daily-growth-trainer-export.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {}
+      document.getElementById('export-json-text').value = payload;
+      document.getElementById('export-modal').classList.remove('hidden');
+      showToast('Export ready!');
+    });
+
+    document.getElementById('close-export-modal').addEventListener('click', () => {
+      document.getElementById('export-modal').classList.add('hidden');
+    });
+
+    document.getElementById('copy-export-json-btn').addEventListener('click', () => {
+      const txt = document.getElementById('export-json-text').value;
+      copyTextFallback(txt);
+      showToast('JSON copied to clipboard!');
+    });
+
+    // Ensure every external link gives immediate feedback & copies URL if preview blocks popups
+    document.addEventListener('click', (e) => {
+      const extLink = e.target.closest('a[target="_blank"]');
+      if (extLink && extLink.href) {
+        copyTextFallback(extLink.href);
+        showToast('Opening link (URL also copied to clipboard)');
+      }
+    });
+
+    document.getElementById('save-profile-btn').addEventListener('click', () => {
+      state.profile.role = document.getElementById('profile-role-input').value.trim() || 'Senior PM / Product Lead';
+      state.profile.goal = document.getElementById('profile-goal-input').value.trim();
+      state.profile.driveRepoLabel = document.getElementById('profile-drive-label').value.trim() || 'Product';
+      state.profile.driveRepoUrl = document.getElementById('profile-drive-url').value.trim() || 'https://drive.google.com/drive/folders/1uTYaWv8x16N0653kevCJ6T_Q6UuyOUtr?usp=drive_link';
+      state.aiConfig.provider = document.getElementById('ai-provider-select').value;
+      state.aiConfig.apiKey = document.getElementById('ai-key-input').value.trim();
+      state.analyticsWebhook = document.getElementById('analytics-webhook-input').value.trim();
+      const selModel = document.getElementById('ai-model-select').value;
+      const customModel = document.getElementById('ai-custom-model-input').value.trim();
+      state.aiConfig.model = (selModel === 'custom' || customModel) ? (customModel || 'gemini-3.8-flash') : selModel;
+      saveState();
+      renderAll();
+      const msg = document.getElementById('profile-saved-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2500);
+      showToast('Profile & AI settings saved!');
+    });
+
+    document.getElementById('install-help-btn').addEventListener('click', () => {
+      document.getElementById('install-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-install-modal').addEventListener('click', () => {
+      document.getElementById('install-modal').classList.add('hidden');
+    });
+
+    function extractDriveFolderId(url) {
+      const m = String(url || '').match(/folders\/([a-zA-Z0-9_-]+)/);
+      return m ? m[1] : null;
+    }
+
+    function openDrivePermissionModal(title, desc) {
+      document.getElementById('drive-modal-title').textContent = title;
+      document.getElementById('drive-modal-desc').textContent = desc;
+      document.getElementById('drive-modal-open-link').href = state.profile.driveRepoUrl || 'https://drive.google.com';
+      document.getElementById('drive-permission-modal').classList.remove('hidden');
+      try {
+        if (window.lucide) window.lucide.createIcons();
+      } catch (e) {}
+    }
+
+    async function checkAndSyncDriveFolder() {
+      const url = document.getElementById('profile-drive-url')?.value.trim() || state.profile.driveRepoUrl;
+      const folderId = extractDriveFolderId(url);
+      if (!folderId) {
+        openDrivePermissionModal('Invalid Drive Folder Link', 'Please paste a valid Google Drive folder link (containing /folders/...).');
+        return;
+      }
+
+      const key = document.getElementById('ai-key-input')?.value.trim() || state.aiConfig.apiKey.trim();
+      const provider = document.getElementById('ai-provider-select')?.value || state.aiConfig.provider;
+      if (!key || provider !== 'gemini') {
+        openDrivePermissionModal(
+          'Permission & API Key Needed to Auto-Read Drive',
+          'Your Drive folder is linked, and your 5 subfolders are already available in Sources. To automatically scan new files inside Drive from the browser, add your Google API key (with Google Drive API enabled) and set folder access to Viewer.'
+        );
+        return;
+      }
+
+      showToast('Checking Google Drive folder read access...');
+      try {
+        const endpoint = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${folderId}' in parents and trashed = false`)}&fields=files(id,name,mimeType,webViewLink)&key=${encodeURIComponent(key)}`;
+        const res = await fetch(endpoint);
+        if (res.status === 401 || res.status === 403 || res.status === 404) {
+          openDrivePermissionModal(
+            'Drive Folder Permission Required',
+            `Google Drive returned status ${res.status}. Either the folder is private ("Restricted") or Google Drive API is not enabled on your Google API key.`
+          );
+          return;
+        }
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+        const files = data.files || [];
+        if (!files.length) {
+          showToast('Drive folder connected! No files found at top level.');
+          return;
+        }
+        let added = 0;
+        files.forEach((f) => {
+          const exists = state.sources.some((s) => s.url === f.webViewLink);
+          if (!exists && f.webViewLink) {
+            state.sources.unshift({
+              id: `drv-${f.id}`,
+              title: `Drive: ${f.name}`,
+              url: f.webViewLink,
+              type: 'Drive',
+              notes: `Synced from ${state.profile.driveRepoLabel || 'Drive'} (${f.mimeType.split('.').pop()})`
+            });
+            added += 1;
+          }
+        });
+        saveState();
+        renderSources();
+        showToast(added ? `Synced ${added} new item(s) from Google Drive!` : `Drive connected (${files.length} items already up to date).`);
+      } catch (err) {
+        openDrivePermissionModal(
+          'Could Not Read Drive Automatically',
+          'Browser could not read the folder directly. Follow the steps below to grant read access or import files manually.'
+        );
+      }
+    }
+
+    async function testAIKey() {
+      let provider = document.getElementById('ai-provider-select').value;
+      const key = document.getElementById('ai-key-input').value.trim();
+      const statusEl = document.getElementById('ai-key-status');
+      statusEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700', 'bg-rose-50', 'text-rose-700', 'bg-slate-100', 'text-slate-700');
+
+      if (key && provider === 'offline') {
+        provider = key.startsWith('sk-') ? 'openai' : 'gemini';
+        document.getElementById('ai-provider-select').value = provider;
+      }
+
+      if (provider === 'offline' || !key) {
+        statusEl.classList.add('bg-slate-100', 'text-slate-700');
+        statusEl.textContent = 'Offline Starter Bank selected. Paste a Gemini or OpenAI key above to test live AI.';
+        return;
+      }
+
+      statusEl.classList.add('bg-slate-100', 'text-slate-700');
+      statusEl.textContent = 'Verifying key (max 10s)...';
+
+      try {
+        const selModel = document.getElementById('ai-model-select').value;
+        const customModel = document.getElementById('ai-custom-model-input').value.trim();
+        state.aiConfig.provider = provider;
+        state.aiConfig.apiKey = key;
+        state.aiConfig.model = (selModel === 'custom' || customModel) ? (customModel || (provider === 'openai' ? 'gpt-4o-mini' : 'gemini-3.8-flash')) : selModel;
+
+        if (provider === 'gemini') {
+          const listRes = await fetchWithTimeout(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`,
+            {},
+            8000
+          );
+          const listData = await listRes.json().catch(() => ({}));
+          if (!listRes.ok) {
+            throw new Error(listData.error?.message || `HTTP ${listRes.status}`);
+          }
+          const usable = (listData.models || [])
+            .filter((m) => (m.supportedGenerationMethods || []).includes('generateContent'))
+            .map((m) => m.name.replace(/^models\//, ''));
+          const preferredOrder = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-4-argon'];
+          const bestModel = preferredOrder.find((m) => usable.includes(m)) || usable.find((m) => !m.includes('2.5-flash') && !m.includes('2.0-flash') && !m.includes('1.5')) || 'gemini-3.8-flash';
+          if (!state.aiConfig.model || state.aiConfig.model === 'gemini-2.5-flash' || !usable.includes(state.aiConfig.model)) {
+            state.aiConfig.model = bestModel;
+          }
+        }
+
+        const reply = await callUserLLM('Reply with OK', true);
+        if (reply) {
+          saveState();
+          renderHeaderAndNav();
+          renderProfile();
+          statusEl.classList.remove('bg-slate-100', 'text-slate-700');
+          statusEl.classList.add('bg-emerald-50', 'text-emerald-700');
+          statusEl.textContent = `Key verified and saved! (${provider.toUpperCase()} • ${state.aiConfig.model})`;
+        } else {
+          throw new Error('Empty response');
+        }
+      } catch (err) {
+        statusEl.classList.remove('bg-slate-100', 'text-slate-700');
+        statusEl.classList.add('bg-rose-50', 'text-rose-700');
+        statusEl.textContent = `Key test failed: ${err?.message || 'Network/CORS error'}. If you see a network error in this preview, download/open the HTML file directly in Chrome or Safari.`;
+      }
+    }
+
+    document.getElementById('drive-file-import').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = String(reader.result || '');
+        if (file.name.endsWith('.json')) {
+          try {
+            const parsed = JSON.parse(text);
+            if (Array.isArray(parsed.sources)) {
+              state.sources = [...parsed.sources, ...state.sources];
+            }
+            if (Array.isArray(parsed.journal)) {
+              state.journal = [...parsed.journal, ...state.journal];
+            }
+            saveState();
+            renderAll();
+            showToast(`Imported backup from ${file.name}!`);
+            return;
+          } catch (err) {}
+        }
+        state.sources.unshift({
+          id: `imp-${Date.now()}`,
+          title: `Imported: ${file.name}`,
+          url: state.profile.driveRepoUrl || 'https://drive.google.com',
+          type: 'Notes',
+          notes: text.slice(0, 240).replace(/\s+/g, ' ').trim()
+        });
+        saveState();
+        renderSources();
+        showToast(`Added ${file.name} to your Sources!`);
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    document.getElementById('check-drive-sync-btn').addEventListener('click', checkAndSyncDriveFolder);
+    document.getElementById('profile-check-drive-btn').addEventListener('click', checkAndSyncDriveFolder);
+    async function fetchAvailableModels() {
+      const key = document.getElementById('ai-key-input').value.trim();
+      const statusEl = document.getElementById('ai-key-status');
+      statusEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700', 'bg-rose-50', 'text-rose-700', 'bg-slate-100', 'text-slate-700');
+      if (!key) {
+        statusEl.classList.add('bg-slate-100', 'text-slate-700');
+        statusEl.textContent = 'Paste your Gemini API key first, then click Load My Models.';
+        return;
+      }
+      statusEl.classList.add('bg-slate-100', 'text-slate-700');
+      statusEl.textContent = 'Fetching supported models for your key...';
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+        const usable = (data.models || [])
+          .filter((m) => (m.supportedGenerationMethods || []).includes('generateContent'))
+          .map((m) => m.name.replace(/^models\//, ''));
+        if (!usable.length) throw new Error('No generateContent models found for this key');
+        const sel = document.getElementById('ai-model-select');
+        sel.innerHTML = usable.map((id) => `<option value="${escapeHtml(id)}">${escapeHtml(id)}</option>`).join('') + '<option value="custom">Custom model ID...</option>';
+        state.aiConfig.provider = 'gemini';
+        document.getElementById('ai-provider-select').value = 'gemini';
+        state.aiConfig.model = usable[0];
+        saveState();
+        statusEl.classList.remove('bg-slate-100', 'text-slate-700');
+        statusEl.classList.add('bg-emerald-50', 'text-emerald-700');
+        statusEl.textContent = `Loaded ${usable.length} supported models! Selected: ${usable[0]}`;
+      } catch (err) {
+        statusEl.classList.remove('bg-slate-100', 'text-slate-700');
+        statusEl.classList.add('bg-rose-50', 'text-rose-700');
+        statusEl.textContent = `Could not list models: ${err?.message || 'Network/CORS error'}`;
+      }
+    }
+
+    document.getElementById('fetch-models-btn').addEventListener('click', fetchAvailableModels);
+    document.getElementById('test-ai-key-btn').addEventListener('click', testAIKey);
+    document.getElementById('close-drive-modal').addEventListener('click', () => {
+      document.getElementById('drive-permission-modal').classList.add('hidden');
+    });
+
+    document.getElementById('export-logs-csv-btn').addEventListener('click', () => {
+      const logs = state.activityLogs || [];
+      const rows = [['Timestamp', 'Role', 'Event Type', 'Detail'], ...logs.map((l) => [l.ts, l.role, l.type, l.detail])];
+      const csv = rows.map((r) => r.map((c) => `"${String(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      try {
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'daily-growth-trainer-logs.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {}
+      copyTextFallback(csv);
+      showToast('Exported activity logs CSV (and copied to clipboard)!');
+    });
+
+    document.getElementById('clear-logs-btn').addEventListener('click', () => {
+      state.activityLogs = [];
+      saveState();
+      renderAnalytics();
+      showToast('Activity logs cleared.');
+    });
+
+    if (!(state.activityLogs || []).length) {
+      logEvent('session_opened', state.profile.role);
+    }
+
+    renderAll();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
