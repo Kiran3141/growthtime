@@ -1489,6 +1489,12 @@
         return;
       }
 
+      const genBtn = document.getElementById('ai-generate-session-btn');
+      const origBtnHtml = genBtn ? genBtn.innerHTML : '';
+      if (genBtn) {
+        genBtn.disabled = true;
+        genBtn.textContent = 'Generating...';
+      }
       showToast('Generating custom session from your sources...');
       const sourceSummary = state.sources.map((s) => `- ${s.title} (${s.url}): ${s.notes}`).join('\n');
       const pillars = state.profile.activePillars.join(', ');
@@ -1560,19 +1566,38 @@ Return ONLY valid JSON with this exact shape:
           }
         }
         if (Array.isArray(parsed)) parsed = parsed[0];
-        if (parsed && Array.isArray(parsed.questions) && parsed.questions.length >= 1 && parsed.concept) {
-          state.todaySession = {
-            questions: parsed.questions.map((q, i) => ({ ...q, id: `ai-${Date.now()}-${i}`, answer: '', feedback: '', done: false })),
-            concept: { ...parsed.concept, id: `ai-c-${Date.now()}`, done: false }
-          };
-          saveState();
-          state.activeNav = 'today';
-          state.activeBlock = 0;
-          resetTimer();
-          renderAll();
-          logEvent('ai_session_generated', state.aiConfig.model || 'gemini');
-          showToast('Generated fresh AI session from your sources!');
+        if (!parsed || !Array.isArray(parsed.questions) || !parsed.questions.length || !parsed.concept) {
+          throw new Error('Missing questions or concept in AI response');
         }
+        state.todaySession = {
+          questions: parsed.questions.slice(0, 2).map((q, i) => ({
+            pillar: q.pillar || state.profile.activePillars[i % state.profile.activePillars.length] || 'Product Strategy',
+            prompt: q.prompt || 'Analyze a key product trade-off from your sources.',
+            framework: q.framework || '1) Context -> 2) Options & trade-offs -> 3) Recommendation & metrics.',
+            sourceRef: q.sourceRef || state.profile.role,
+            id: `ai-${Date.now()}-${i}`,
+            answer: '',
+            feedback: '',
+            done: false
+          })),
+          concept: {
+            title: parsed.concept.title || 'Leadership Concept',
+            sourceName: parsed.concept.sourceName || 'Your Sources',
+            format: parsed.concept.format || '30m Read',
+            url: parsed.concept.url || (state.sources[0]?.url || 'https://www.svpg.com'),
+            summary: parsed.concept.summary || '',
+            lens: Array.isArray(parsed.concept.lens) ? parsed.concept.lens : ['How does this apply to your current team?'],
+            id: `ai-c-${Date.now()}`,
+            done: false
+          }
+        };
+        saveState();
+        state.activeNav = 'today';
+        state.activeBlock = 0;
+        resetTimer();
+        renderAll();
+        logEvent('ai_session_generated', state.aiConfig.model || 'gemini');
+        showToast('Generated fresh AI session from your sources!');
       } catch (err) {
         state.dayIndex += 1;
         state.todaySession = buildSessionFromBank(state.dayIndex);
@@ -1581,6 +1606,11 @@ Return ONLY valid JSON with this exact shape:
         renderAll();
         logEvent('ai_session_error', err?.message || 'Unknown parse error');
         showToast(`AI session error: ${err?.message || 'parse failed'} — loaded curated set.`);
+      } finally {
+        if (genBtn) {
+          genBtn.disabled = false;
+          genBtn.innerHTML = origBtnHtml;
+        }
       }
     }
 
@@ -2134,7 +2164,7 @@ Return ONLY valid JSON with this exact shape:
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        navigator.serviceWorker.register('./sw.js').then((reg) => reg.update()).catch(() => {});
       });
     }
   </script>
